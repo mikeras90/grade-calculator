@@ -45,12 +45,16 @@ def close_db(e=None):
         db.close()
 
 def init_db():
-    # Initializes the database using schema.sql.
-    db = get_db()
-    with db.cursor() as cur:
-        with open('schema.sql', 'r') as f:
-            cur.execute(f.read())
-    db.commit()
+    #This 'with' block creates the necessary application context
+    with app.app_context():
+        db = get_db()
+        with db.cursor() as cur:
+            with open('schema.sql', 'r') as f:
+                if hasattr(db, 'executescript'):
+                     db.executescript(f.read())
+                else:
+                     cur.execute(f.read())
+        db.commit()
 
 app.teardown_appcontext(close_db)
 
