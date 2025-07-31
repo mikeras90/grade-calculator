@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Instructions</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; line-height: 1.6; }
+        a { color: #007bff; }
+        .container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2, h3 { border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        code { background-color: #eee; padding: 2px 5px; border-radius: 3px; }
+        .step { margin-bottom: 20px; }
+        .step-title { font-size: 1.2em; font-weight: bold; color: #007bff; }
+        .alert { background-color: #fff3cd; border-left: 5px solid #ffeeba; padding: 15px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p><a href="{{ url_for('index') }}">&larr; Back to App Homepage</a></p>
+        <h1>User Guide</h1>
+        <p>This guide explains the complete workflow for using the Grade Calculator and Anonymizer Tool.</p>
+
+        <h2>Part 1: First-Time Setup for a New Class</h2>
+        <p>You only need to do this once per class at the beginning of the semester.</p>
+
+        <div class="step">
+            <p class="step-title">Step 1.1: Use the Anonymizer Tool</p>
+            <ol>
+                <li>Navigate to the <code>anonymizer/anonymizer.html</code> file on your computer and open it in a web browser.</li>
+                <li>For the first input, select your **raw class roster** (CSV file).</li>
+                <li>For the second input, select your **Week 1 transcript**.</li>
+                <li>Click "Process Files". If there are unrecognized names, map them as needed.</li>
+                <li>Your browser will download two files.</li>
+            </ol>
+            <div class="alert">
+                <strong>IMPORTANT:</strong> Save the <code>anonymized_key.csv</code> file in a safe place! This is your permanent "master key" for this class. You will need it every week.
+            </div>
+        </div>
+
+        <div class="step">
+            <p class="step-title">Step 1.2: Set Up the Class in the Main App</p>
+            <ol>
+                <li>Go to the main application homepage.</li>
+                <li>Create your new class.</li>
+                <li>On the class page, you'll be prompted to create a roster. Enter the total number of students in your class and click "Create Roster".</li>
+                <li>The page will now show a list of pseudonyms (Student-1, Student-2, etc.).</li>
+                <li>Under "Transcript Analysis for Week 1", upload the <code>anonymized_transcript.txt</code> file you downloaded.</li>
+            </ol>
+        </div>
+        
+        <h2>Part 2: Weekly Workflow (for Weeks 2+)</h2>
+        <p>This is the process you will repeat each week.</p>
+        
+        <div class="step">
+            <p class="step-title">Step 2.1: Use the Anonymizer Tool</p>
+            <ol>
+                <li>Open the <code>anonymizer.html</code> file again.</li>
+                <li>For the first input, select your saved <strong><code>anonymized_key.csv</code></strong> file.</li>
+                <li>For the second input, select the new week's transcript (e.g., Week 2 transcript).</li>
+                <li>Click "Process Files".</li>
+                <li>Your browser will download a new <code>anonymized_transcript.txt</code> for the current week.</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <p class="step-title">Step 2.2: Upload Data to the Main App</p>
+            <ol>
+                <li>In the main application, navigate to the correct week using the week navigation bar (Week 2, Week 3, etc.).</li>
+                <li>Enter and save any attendance data for that week.</li>
+                <li>Upload the new <code>anonymized_transcript.txt</code> file for that week.</li>
+            </ol>
+        </div>
+
+        <h2>Part 3: Viewing Reports</h2>
+        <p>At any time, you can use the links at the top of a class page to:</p>
+        <ul>
+            <li><strong>View Full Summary Report:</strong> See a grid of all data for all students across all weeks.</li>
+            <li><strong>Grade Settings and Final Report:</strong> Adjust grading weights and view the final calculated grades for the semester.</li>
+        </ul>
+        <p>Remember, the reports in the app will only show pseudonyms. Use your saved <code>anonymized_key.csv</code> file to match them to your real students.</p>
+
+    </div>
+</body>
+</html>

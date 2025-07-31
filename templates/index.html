@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grade Calculator Hub</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; line-height: 1.6; }
+        .class-list { list-style-type: none; padding: 0; }
+        .class-list li a { display: block; text-decoration: none; color: #333; background-color: #f9f9f9; border: 1px solid #ddd; margin-bottom: 10px; padding: 15px; border-radius: 5px; transition: background-color 0.2s; }
+        .class-list li a:hover { background-color: #eef; }
+        .form-section { background-color: #eef; padding: 20px; border-radius: 5px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"] { width: 95%; padding: 8px; margin-bottom: 10px; }
+        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Grade Calculator Hub</h1>
+    <p>Welcome! <a href="/instructions">Click here for user instructions.</a></p>
+    <h2>Existing Classes</h2>
+    <ul class="class-list">
+        {% for class in classes %}
+            <li><a href="{{ url_for('class_redirect', class_id=class['id']) }}">{{ class['name'] }} - {{ class['semester'] }}</a></li>
+        {% else %}
+            <li>No classes found. Add one below!</li>
+        {% endfor %}
+    </ul>
+    <hr>
+    <div class="form-section">
+        <h2>Create a New Class</h2>
+        <form action="/add_class" method="POST">
+            <label for="className">Class Name</label>
+            <input type="text" id="className" name="className" placeholder="e.g., Intro to Psychology" required>
+            <label for="semester">Semester</label>
+            <input type="text" id="semester" name="semester" placeholder="e.g., Fall 2025" required>
+            <button type="submit">Add Class</button>
+        </form>
+    </div>
+</body>
+</html>

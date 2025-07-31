@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grade Settings & Final Report - {{ class_info['name'] }}</title>
+    <style>
+        body { font-family: sans-serif; max-width: 1200px; margin: auto; padding: 20px; line-height: 1.6; }
+        a { color: #007bff; }
+        .container { display: flex; gap: 30px; }
+        .settings-form { flex: 1; }
+        .results-table { flex: 2; }
+        .form-group { margin-bottom: 12px; }
+        label { font-weight: bold; display: inline-block; width: 250px;}
+        input[type="number"] { width: 80px; padding: 5px; }
+        h1, h2, h3 { border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px;}
+        th, td { padding: 8px; border: 1px solid #ddd; text-align: left; font-size: 0.9em; }
+        th { background-color: #f2f2f2; }
+        button { background-color: #dc3545; color: white; padding: 12px 20px; border: none; cursor: pointer; border-radius: 5px; font-size: 1.1em;}
+    </style>
+</head>
+<body>
+    <p><a href="{{ url_for('class_redirect', class_id=class_info['id']) }}">&larr; Back to Class Page</a></p>
+    <h1>Grades & Settings</h1>
+    <h2>{{ class_info['name'] }}</h2>
+    <div class="container">
+        <div class="settings-form">
+            <h3>Grade Settings</h3>
+            <form action="{{ url_for('grades_page', class_id=class_info['id']) }}" method="POST">
+                <h4>Participation Grade Settings</h4>
+                <div class="form-group"><label>Base Score:</label> <input type="number" name="base_score" value="{{ settings.base_score }}" step="0.1"></div>
+                <div class="form-group"><label>Maximum Additional Points:</label> <input type="number" name="spread_points" value="{{ settings.spread_points }}" step="0.1"></div>
+                <h4>Participation Weights</h4>
+                <div class="form-group"><label>Speaking Instance Weight:</label> <input type="number" name="instance_weight" value="{{ settings.instance_weight }}" step="0.1"></div>
+                <div class="form-group"><label>Speaking Time Weight (per min):</label> <input type="number" name="time_weight" value="{{ settings.time_weight }}" step="0.01"></div>
+                <div class="form-group"><label>Max Speaking Instances (per week):</label> <input type="number" name="max_instances_per_week" value="{{ settings.max_instances_per_week }}"></div>
+                <h4>Attendance Penalties</h4>
+                <div class="form-group"><label>Synchronous Absence Penalty:</label> <input type="number" name="sync_penalty" value="{{ settings.sync_penalty }}" step="0.1"></div>
+                <div class="form-group"><label>Free Synchronous Absences:</label> <input type="number" name="free_sync_absences" value="{{ settings.free_sync_absences }}"></div>
+                <div class="form-group"><label>Asynchronous Miss Penalty:</label> <input type="number" name="async_penalty" value="{{ settings.async_penalty }}" step="0.1"></div>
+                <div class="form-group"><label>Free Asynchronous Misses:</label> <input type="number" name="free_async_misses" value="{{ settings.free_async_misses }}"></div>
+                <div class="form-group"><label>Video Off Penalty:</label> <input type="number" name="video_off_penalty" value="{{ settings.video_off_penalty }}" step="0.1"></div>
+                <div class="form-group"><label>Free Video Off Classes:</label> <input type="number" name="free_video_off" value="{{ settings.free_video_off }}"></div>
+                {% if results %}{% for res in results %}<input type="hidden" name="student_id" value="{{ res.student_id }}">{% endfor %}{% endif %}
+                <br>
+                <button type="submit">Update Settings & Calculate Final Grades</button>
+        </div>
+        <div class="results-table">
+            <h3>Final Grade Report</h3>
+            {% if results %}
+            <table>
+                <thead>
+                    <tr><th>Student Name</th><th>Absences</th><th>Video Off</th><th>Async Misses</th><th>Time</th><th>Instances (Capped)</th><th>Manual Adj.</th><th>Final Grade</th></tr>
+                </thead>
+                <tbody>
+                    {% for res in results %}
+                    <tr>
+                        <td>{{ res.name }}</td><td>{{ res.absences }}</td><td>{{ res.video_off }}</td><td>{{ res.async_misses }}</td>
+                        <td>{{ res.total_time | timeformat }}</td><td>{{ res.capped_instances }}</td>
+                        <td><input type="number" name="manual_adjustment_{{ res.student_id }}" value="{{ res.manual_adjustment }}" step="0.1" style="width: 50px;"></td>
+                        <td><b>{{ res.final_grade }}</b></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                </tbody>
+            <tfoot>
+                <tr style="font-weight: bold; background-color: #e8f0fe;">
+                    <td>Class Average</td>
+                    <td>{{ averages.absences }}</td>
+                    <td>{{ averages.video_off }}</td>
+                    <td>{{ averages.async_misses }}</td>
+                    <td>{{ averages.total_time }}</td>
+                    <td>{{ averages.capped_instances }}</td>
+                    <td>-</td>
+                    <td>{{ averages.final_grade }}</td>
+                </tr>
+            </tfoot>
+        </table>
+            </table>
+            </form>
+            {% else %}
+            <p>Click the "Calculate Final Grades" button to generate the report.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Summary Report - {{ class_info['name'] }}</title>
+    <style>
+        body { font-family: sans-serif; max-width: 95%; margin: auto; padding: 20px; }
+        a { color: #007bff; text-decoration: none; }
+        h1, h2 { border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 0.8em; min-width: 60px; }
+        th { background-color: #f2f2f2; position: sticky; top: 0; z-index: 2;}
+        /* Style for the student name column */
+        th.student-name, td.student-name { 
+            text-align: left; 
+            font-weight: bold; 
+            width: 180px;
+            position: sticky; 
+            left: 0; 
+            background-color: #f8f9fa;
+            z-index: 1;
+        }
+        th.student-name { z-index: 3; }
+        .header-bar { background-color: #e8f0fe; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        <a href="{{ url_for('class_redirect', class_id=class_info['id']) }}">&larr; Back to Class Page</a>
+    </div>
+
+    <h1>Summary Report</h1>
+    <h2>{{ class_info['name'] }}</h2>
+
+    <div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th class="student-name" rowspan="2">Student Name</th>
+                {% for week in week_numbers %}
+                    <th colspan="4">Week {{ week }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for week in week_numbers %}
+                    <th>Sync</th>
+                    <th>Async</th>
+                    <th>Time</th>
+                    <th>Inst.</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td class="student-name">{{ student['name'] }}</td>
+                {% for week in week_numbers %}
+                    {% set data = summary_data[student['id']].get(week, {}) %}
+                    <td>{{ data.get('sync_status', '-') }}</td>
+                    <td>{{ data.get('async_status', '-') }}</td>
+                    <td>{{ data.get('speaking_time', 0) | timeformat }}</td>
+                    <td>{{ data.get('speaking_instances', 0) }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+</body>
+</html>

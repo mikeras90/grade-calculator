@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Week {{ current_week }} - {{ class_info['name'] }}</title>
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
+        a { color: #007bff; text-decoration: none; }
+        .header-bar { background-color: #e8f0fe; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .section { background-color: #f9f9f9; border: 1px solid #ddd; margin-top: 20px; padding: 0 20px 20px 20px; border-radius: 5px; }
+        h1, h2, h3 { border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px;}
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f2f2f2; }
+        select { padding: 5px; }
+        button { background-color: #28a745; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 5px; }
+        .transcript-form button { background-color: #007bff; }
+        .week-nav { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid #eee;}
+        .week-nav a, .week-nav strong { margin: 0 5px; padding: 5px 10px; border-radius: 5px; }
+        .week-nav a { background-color: #ddd; }
+        .week-nav strong { background-color: #007bff; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        <a href="{{ url_for('index') }}" style="float: left;">&larr; Back to All Classes</a>
+        
+        <a href="{{ url_for('summary_page', class_id=class_info['id']) }}" style="font-weight: bold; display: inline-block; text-align: center; width: 80%;">View Full Summary Report</a>
+
+        <a href="{{ url_for('grades_page', class_id=class_info['id']) }}" style="float: right; font-weight: bold;">Grade Settings and Final Report &raquo;</a>
+        <div style="clear: both;"></div>
+    </div>
+    </div>
+    <h1>{{ class_info['name'] }}</h1>
+    <p><strong>Semester:</strong> {{ class_info['semester'] }}</p>
+    <div class="section">
+        {% if students %}
+            <div class="week-nav">
+                {% for week in range(1, 14) %}
+                    {% if week == current_week %}
+                        <strong>Week {{ week }}</strong>
+                    {% else %}
+                        <a href="{{ url_for('class_page', class_id=class_info['id'], week_num=week) }}">Week {{ week }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <h2>Week {{ current_week }}</h2>
+            <form action="{{ url_for('save_week', class_id=class_info['id'], week_num=current_week) }}" method="POST">
+                <h3>Attendance & Participation Data</h3>
+                <table>
+                    <thead>
+                        <tr><th>Student Name</th><th>Sync Attendance</th><th>Async Participation</th><th>Speaking Time</th><th>Speaking Instances</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        {% set data = weekly_data.get(student['id'], {}) %}
+                        <tr>
+                            <td>{{ student['name'] }}</td>
+                            <td>
+                                <select name="sync_status_{{ student['id'] }}">
+                                    {% set saved_sync = data.get('sync_status', 'Present') %}
+                                    <option value="Present" {% if saved_sync == 'Present' %}selected{% endif %}>Present</option>
+                                    <option value="Absent" {% if saved_sync == 'Absent' %}selected{% endif %}>Absent</option>
+                                    <option value="Excused" {% if saved_sync == 'Excused' %}selected{% endif %}>Excused</option>
+                                    <option value="Video Off" {% if saved_sync == 'Video Off' %}selected{% endif %}>Video Off</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="async_status_{{ student['id'] }}">
+                                    {% set saved_async = data.get('async_status', 'Completed') %}
+                                    <option value="Completed" {% if saved_async == 'Completed' %}selected{% endif %}>Completed</option>
+                                    <option value="Missed" {% if saved_async == 'Missed' %}selected{% endif %}>Missed</option>
+                                </select>
+                            </td>
+                            <td>{{ data.get('speaking_time', 0) | timeformat }}</td>
+                            <td>{{ data.get('speaking_instances', 0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p style="text-align: right; margin-top: 15px;"><button type="submit">Save Week {{ current_week }} Data</button></p>
+            </form>
+            <hr style="margin: 30px 0;">
+            <form class="transcript-form" action="{{ url_for('analyze_transcript', class_id=class_info['id'], week_num=current_week) }}" method="POST" enctype="multipart/form-data">
+                <h3>Transcript Analysis for Week {{ current_week }}</h3>
+                <p><label for="transcript">Upload Transcript File (.txt or .vtt):</label><br><input type="file" id="transcript" name="transcript" accept=".txt,.vtt" required></p>
+                <button type="submit">Analyze Transcript</button>
+            </form>
+        {% else %}
+            <h3>Create Pseudonym Roster</h3>
+                <p>Enter the total number of students in your class to generate a pseudonym roster (e.g., Student-1, Student-2, etc.).</p>
+                <form action="{{ url_for('create_roster', class_id=class_info['id']) }}" method="POST">
+                <p>
+                <label for="num_students">Number of Students:</label><br>
+                <input type="number" id="num_students" name="num_students" required min="1" style="width: 100px; padding: 8px;">
+                </p>
+                <button type="submit">Create Roster</button>
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html>

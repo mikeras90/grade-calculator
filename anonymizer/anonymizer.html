@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transcript Anonymizer Tool</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; line-height: 1.6; background-color: #f4f4f9; }
+        .container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        .file-input { border: 2px dashed #ccc; padding: 20px; border-radius: 5px; text-align: center; margin-bottom: 20px; }
+        label { font-weight: bold; display: block; margin-bottom: 10px; }
+        button { background-color: #007bff; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; width: 100%; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        #log-container { margin-top: 20px; }
+        #log { background-color: #333; color: #lime; font-family: monospace; padding: 15px; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; }
+        #download-links a { display: block; background-color: #28a745; color: white !important; text-align: center; padding: 10px; text-decoration: none; border-radius: 5px; margin-top: 10px; }
+        /* New styles for reconciliation */
+        #reconciliation-container { border-top: 2px solid #ddd; margin-top: 20px; padding-top: 20px; }
+        .mapping-row { margin-bottom: 15px; }
+        .mapping-row label { display: inline-block; width: 200px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Transcript Anonymizer</h1>
+        <p>This tool runs entirely in your browser. Your files are never uploaded until they are anonymized.</p>
+        
+        <div class="file-input">
+            <label for="rosterFile">1. Select Roster (for Week 1) OR Saved Key File (for Week 2+)</label>
+            <input type="file" id="rosterFile" accept=".csv">
+            <div style="margin-top: 10px; display: flex; align-items: center; justify-content: center;">
+                <input type="checkbox" id="hasHeader" checked style="margin-right: 8px;">
+                <label for="hasHeader" style="display: inline; font-weight: normal; margin: 0;">First row is a header</label>
+            </div>
+        </div>
+        
+        <div class="file-input">
+            <label for="transcriptFile">2. Select Transcript File (.txt, .vtt)</label>
+            <input type="file" id="transcriptFile" accept=".txt,.vtt">
+        </div>
+        
+        <button id="processButton" disabled>Process Files</button>
+
+        <div id="reconciliation-container" style="display: none;">
+            <h2>Step 2: Reconcile Unrecognized Names</h2>
+            <p>The following names were found in the transcript but not on the roster. Please match them to the correct student.</p>
+            <div id="reconciliation-form"></div>
+            <button id="finalizeButton">Save Mappings & Anonymize</button>
+        </div>
+        
+        <div id="log-container" style="display: none;">
+            <h3>Processing Log:</h3>
+            <pre id="log"></pre>
+        </div>
+
+        <div id="download-links"></div>
+
+    </div>
+    <script src="anonymizer.js"></script>
+</body>
+</html>
