@@ -41,9 +41,9 @@ def get_db():
     if 'db' not in g:
         db_url = os.environ.get('DATABASE_URL')
         if db_url:
-            # Connect to PostgreSQL on Render
-            g.db = psycopg2.connect(db_url)
-            g.db.row_factory = psycopg2.extras.DictCursor
+            # Connect to PostgreSQL and get a cursor
+            conn = psycopg2.connect(db_url)
+            g.db = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         else:
             # Connect to local SQLite database
             g.db = sqlite3.connect(DATABASE)
@@ -62,6 +62,9 @@ def init_db():
 def close_db(e=None):
     db = g.pop('db', None)
     if db is not None:
+        # Check if it has a 'connection' attribute (for PostgreSQL)
+        if hasattr(db, 'connection'):
+            db.connection.close()
         db.close()
 
 app.teardown_appcontext(close_db)
