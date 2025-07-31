@@ -61,7 +61,7 @@ def init_db():
 
 def close_db(e=None):
     db = g.pop('db', None)
-    if db is not in None:
+    if db is not None:
         db.close()
 
 app.teardown_appcontext(close_db)
@@ -121,11 +121,13 @@ def parse_time_to_seconds(time_str):
     return []
 
 @app.route('/')
+@auth.login_required
 def index():
     db = get_db(); classes = db.execute('SELECT * FROM classes ORDER BY name').fetchall(); db.close()
     return render_template('index.html', classes=classes)
 
 @app.route('/add_class', methods=['POST'])
+@auth.login_required
 def add_class():
     name = request.form['className']; semester = request.form['semester']
     db = get_db(); cursor = db.cursor()
@@ -134,10 +136,12 @@ def add_class():
     return redirect(url_for('index'))
 
 @app.route('/class/<int:class_id>')
+@auth.login_required
 def class_redirect(class_id):
     return redirect(url_for('class_page', class_id=class_id, week_num=1))
 
 @app.route('/class/<int:class_id>/week/<int:week_num>')
+@auth.login_required
 def class_page(class_id, week_num):
     db = get_db()
     settings_exist = db.execute('SELECT 1 FROM settings WHERE class_id = ?', (class_id,)).fetchone()
@@ -158,6 +162,7 @@ def class_page(class_id, week_num):
     return render_template('class_page.html', class_info=class_info, students=students, weekly_data=weekly_data, current_week=week_num)
 
 @app.route('/create_roster/<int:class_id>', methods=['POST'])
+@auth.login_required
 def create_roster(class_id):
     try:
         num_students = int(request.form.get('num_students'))
@@ -240,6 +245,7 @@ def create_roster(class_id):
     return redirect(url_for('class_page', class_id=class_id, week_num=1))
 
 @app.route('/save_week/<int:class_id>/<int:week_num>', methods=['POST'])
+@auth.login_required
 def save_week(class_id, week_num):
     db = get_db()
     students = db.execute('SELECT * FROM students WHERE class_id = ?', (class_id,)).fetchall()
@@ -252,6 +258,7 @@ def save_week(class_id, week_num):
     return redirect(url_for('class_page', class_id=class_id, week_num=week_num))
 
 @app.route('/analyze_transcript/<int:class_id>/<int:week_num>', methods=['POST'])
+@auth.login_required
 def analyze_transcript(class_id, week_num):
     transcript_file = request.files.get('transcript')
     if not transcript_file:
@@ -322,6 +329,7 @@ def analyze_transcript(class_id, week_num):
     return redirect(url_for('class_page', class_id=class_id, week_num=week_num))
 
 @app.route('/grades/<int:class_id>', methods=['GET', 'POST'])
+@auth.login_required
 def grades_page(class_id):
     db = get_db()
     settings = db.execute('SELECT * FROM settings WHERE class_id = ?', (class_id,)).fetchone()
@@ -386,6 +394,7 @@ def grades_page(class_id):
     return render_template('grades_page.html', class_info=class_info, settings=settings, results=final_results, averages=averages)
 
 @app.route('/summary/<int:class_id>')
+@auth.login_required
 def summary_page(class_id):
     db = get_db()
     class_info = db.execute('SELECT * FROM classes WHERE id = ?', (class_id,)).fetchone()
@@ -417,6 +426,7 @@ def summary_page(class_id):
                            week_numbers=week_numbers)
 
 @app.route('/instructions')
+@auth.login_required
 def instructions():
     return render_template('instructions.html')
 
